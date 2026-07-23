@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.API.Data;
 using TaskManager.API.Middlewares;
@@ -6,8 +7,12 @@ using TaskManager.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registro dos Controllers
-builder.Services.AddControllers();
+// Registro dos Controllers com configuração global de serialização de Enums como Strings
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Registro das Camadas do Aplicativo (Injeção de Dependência)
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();

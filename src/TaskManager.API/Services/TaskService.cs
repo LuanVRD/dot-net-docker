@@ -39,7 +39,7 @@ public class TaskService : ITaskService
             t.Id,
             t.Title,
             t.Description,
-            t.Status.ToString(),
+            t.Status,
             t.CreatedAt,
             t.UpdatedAt
         ));
@@ -58,7 +58,7 @@ public class TaskService : ITaskService
             task.Id,
             task.Title,
             task.Description,
-            task.Status.ToString(),
+            task.Status,
             task.CreatedAt,
             task.UpdatedAt
         );
@@ -91,7 +91,7 @@ public class TaskService : ITaskService
             task.Id,
             task.Title,
             task.Description,
-            task.Status.ToString(),
+            task.Status,
             task.CreatedAt,
             task.UpdatedAt
         );
