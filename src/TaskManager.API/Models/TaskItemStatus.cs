@@ -1,6 +1,6 @@
 namespace TaskManager.API.Models;
 
-public enum TaskStatus
+public enum TaskItemStatus
 {
     Pending = 0,
     InProgress = 1,

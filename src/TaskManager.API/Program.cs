@@ -1,4 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using TaskManager.API.Data;
+using TaskManager.API.Middlewares;
+using TaskManager.API.Repositories;
+using TaskManager.API.Services;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Registro dos Controllers
+builder.Services.AddControllers();
+
+// Registro das Camadas do Aplicativo (Injeção de Dependência)
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+
+// Registro do DbContext com PostgreSQL
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Registro do Handler Global de Exceções (.NET 9)
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Configuração do Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -14,6 +35,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Ativa o middleware de tratamento de exceções global
+app.UseExceptionHandler();
+
 // Configura o pipeline de requisições HTTP
 if (app.Environment.IsDevelopment())
 {
@@ -21,7 +45,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManager API v1");
-        options.RoutePrefix = "swagger"; // Exposto em http://localhost:PORT/swagger
+        options.RoutePrefix = "swagger";
     });
 }
 
@@ -34,5 +58,14 @@ app.MapGet("/", () => Results.Ok(new
 }))
 .WithName("GetStatus")
 .WithOpenApi();
+
+// Mapeamento das rotas dos Controllers
+app.MapControllers();
+
+// Aplica migrações automáticas se não for ambiente de CLI/Build
+if (!EF.IsDesignTime)
+{
+    app.ApplyMigrations();
+}
 
 app.Run();
